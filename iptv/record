@@ -1,9 +1,18 @@
 #!/bin/sh
-###############################
-# SYNOPSIS                    #
-# record channel output       #
-#                             #
-# just avaible with a tud ip. #
-###############################
+##################################
+# SYNOPSIS                       #
+# record channel output [handle] #
+#                                #
+# just avaible with a tud ip.    #
+##################################
 
-wget -O "$2.avi" http://iptv.fbihome.de/streams/tv/$1
+ip=$(check-ip | sed 's/\([0-9]*\).*/\1/')
+
+case $ip in
+  130)
+    wget -O "$2.avi" http://iptv.fbihome.de/streams/tv/$1
+    ;;
+  *)
+    ssh -2 $3 wget -O - http://iptv.fbihome.de/streams/tv/$1 > $2.avi
+    ;;
+esac

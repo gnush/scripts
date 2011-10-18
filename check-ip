@@ -1,0 +1,9 @@
+#!/bin/sh
+########################
+# checks the public ip #
+#                      #
+# Dependencies:        #
+# wget, grep, awk, sed #
+########################
+
+wget -q -O - "http://wieistmeineip.com/" | grep "Your IP" | awk '{ print $4 }' | sed 's/[a-z,=,",<,>,/]//g' | sed 's/^.//'

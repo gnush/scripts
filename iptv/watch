@@ -1,12 +1,21 @@
 #!/bin/sh
 ###############################
 # SYNOPSIS                    #
-# watch channel               #
+# watch channel [ssh profile] #
 #                             #
 # channels can be found at    #
 # http://wiki.fbihome.de/IPTV #
 #                             #
-# just avaible with a tud ip. #
+# skript uses check-ip        #
 ###############################
 
-wget -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
+ip=$(check-ip | sed 's/\([0-9]*\).*/\1/')
+
+case $ip in
+  130)
+    wget -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
+    ;;
+  *)
+    ssh -2 $2 wget -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
+    ;;
+esac
