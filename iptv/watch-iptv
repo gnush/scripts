@@ -1,0 +1,12 @@
+#!/bin/sh
+###############################
+# SYNOPSIS                    #
+# watch channel               #
+#                             #
+# channels can be found at    #
+# http://wiki.fbihome.de/IPTV #
+#                             #
+# just avaible with a tud ip. #
+###############################
+
+wget -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
