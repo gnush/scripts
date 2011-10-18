@@ -1,0 +1,9 @@
+#!/bin/sh
+###############################
+# SYNOPSIS                    #
+# record channel output       #
+#                             #
+# just avaible with a tud ip. #
+###############################
+
+wget -O "$2.avi" http://iptv.fbihome.de/streams/tv/$1
