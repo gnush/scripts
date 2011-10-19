@@ -13,9 +13,9 @@ ip=$(check-ip | sed 's/\([0-9]*\).*/\1/')
 
 case $ip in
   130)
-    wget -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
+    wget -q -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
     ;;
   *)
-    ssh -2 $2 wget -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
+    ssh -2 $2 wget -q -O - http://iptv.fbihome.de/streams/tv/$1 | mplayer -cache 8192 -
     ;;
 esac
