@@ -1,12 +1,12 @@
 #!/bin/sh
 ###############################
 # SYNOPSIS                    #
-# watch channel [ssh profile] #
+# watch channel [handle]      #
 #                             #
 # channels can be found at    #
 # http://wiki.fbihome.de/IPTV #
 #                             #
-# skript uses check-ip        #
+# script uses check-ip        #
 ###############################
 
 ip=$(check-ip | sed 's/\([0-9]*\).*/\1/')

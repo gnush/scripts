@@ -2,8 +2,6 @@
 ##################################
 # SYNOPSIS                       #
 # record channel output [handle] #
-#                                #
-# just avaible with a tud ip.    #
 ##################################
 
 ip=$(check-ip | sed 's/\([0-9]*\).*/\1/')
