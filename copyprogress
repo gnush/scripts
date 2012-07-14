@@ -11,4 +11,4 @@ if [ -d $2 ]; then
     FILENAME="/"$(basename $1)
 fi
 
-dd if=$1 | pv -p -r -s $(du -b $1) | dd of=$2$FILENAME
+dd status=noxfer if=$1 | pv -p -r -s $(du -b $1) | dd of=$2$FILENAME
