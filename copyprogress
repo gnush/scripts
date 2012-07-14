@@ -1,14 +1,29 @@
 #!/bin/sh
-#
-# NAME
-#   copyprogress
-# SYNOPSYS
-#   copyprogress SRC DST
+#############################
+# NAME                      #
+#   copyprogress            #
+# SYNOPSYS                  #
+#   copyprogress SRC DST    #
+#############################
+if [ -d $1 -a -d $2 ]; then
+    if [ ${1#${1%?}} != "/" ]; then
+        SRC=$1/
+    else
+        SRC=$1
+    fi
 
-FILENAME=""
+    DST=$2/$(basename $1)
+    mkdir -p $DST
 
-if [ -d $2 ]; then
-    FILENAME="/"$(basename $1)
+    ls -A -b -1 $1 | while read f;
+    do
+        $0 $SRC$f $DST
+    done;
+else
+    FILENAME=""
+    if [ -d $2 ]; then
+        FILENAME="/"$(basename $1)
+    fi
+
+    dd status=noxfer if=$1 | pv -p -r -s $(du -b $1) | dd status=noxfer of=$2$FILENAME
 fi
-
-dd status=noxfer if=$1 | pv -p -r -s $(du -b $1) | dd of=$2$FILENAME
