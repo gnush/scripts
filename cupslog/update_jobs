@@ -1,5 +1,5 @@
 #!/bin/zsh
-# evaluates cups log files.
+# evaluates cups log file
 # saves in the selected sqlite3 db
 # by gnush
 

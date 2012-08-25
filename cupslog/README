@@ -1,0 +1,3 @@
+Evaluates /var/log/cups/page_log.
+Stores user, printer and time in a sqlite3 database.
+The needed database schema is given in the file "sql".
