@@ -1,0 +1,10 @@
+CREATE TABLE user ( uid INTEGER PRIMARY KEY ASC,
+                    name varchar(64));
+
+CREATE TABLE printer ( pid INTEGER PRIMARY KEY ASC,
+                    name varchar(64));
+
+CREATE TABLE jobs ( jid INTEGER PRIMARY KEY ASC,
+                    uid INTEGER,
+                    pid INTEGER,
+                    time INTEGER);

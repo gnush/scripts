@@ -25,5 +25,5 @@ else
         FILENAME="/"$(basename $1)
     fi
 
-    dd status=noxfer if=$1 | pv -p -r -s $(du -b $1) | dd status=noxfer of=$2$FILENAME
+    dd status=noxfer if=$1 | pv -p -r -s $(du -b "$1") | dd status=noxfer of=$2$FILENAME
 fi

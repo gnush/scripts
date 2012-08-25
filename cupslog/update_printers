@@ -1,0 +1,30 @@
+#!/bin/zsh
+# updates the available printers
+# in the selected db (sqlite3)
+# by gnush
+
+DB=""
+ID=$(sqlite3 $DB 'SELECT pid FROM printer' | tail -n 1)
+
+# checks if id is empty
+if [ ! -n $ID ]; then
+    $ID=-1
+fi
+
+lpstat -a | while read line;
+do
+    if [ ! -n "$line" ]; then
+        continue
+    fi
+
+    cur=$(echo $line | awk '{ print $1 }')
+
+    # checks if printer is already included
+    stmt=$(sqlite3 $DB "SELECT * FROM printer WHERE name=$(echo \"$cur\")")
+    if [ -n "$stmt" ]; then
+        continue
+    fi
+
+    ID=$(($ID+1))
+    sqlite3 $DB "INSERT INTO printer VALUES ($ID, \"$cur\")"
+done;

@@ -1,0 +1,37 @@
+#!/bin/zsh
+# updates the available users
+# in the selected db (sqlite3)
+# by gnush
+
+DB=""       # path to db
+URL=""      # url to csv
+POS=1       # position of username in csv
+ID=$(sqlite3 $DB 'SELECT uid FROM user' | tail -n 1)
+
+# fetch the users
+# from an (online) csv
+FILE=/tmp/csv_$(date +%s)
+wget -q --no-check-certificate  $URL $FILE
+sed -i 1d $FILE
+CSV=$(cat $FILE)
+rm $FILE
+
+# checks if id is empty
+if [ ! -n $ID ]; then
+    $ID=-1
+fi
+
+# update database
+echo $CSV | while read line;
+do
+    usr=$(echo $line | sed 's/ //g' | sed 's/,/ /g' | awk "{ print \$$POS }" | sed 's/"//g')
+
+    # checks if user already in the db
+    stmt=$(sqlite3 $DB "SELECT * FROM user WHERE name=$(echo \"$usr\")")
+    if [ -n "$stmt" ]; then
+        continue
+    fi
+
+    ID=$(($ID+1))
+    sqlite3 $DB "INSERT INTO user VALUES ( $ID, \"$usr\")"
+done;

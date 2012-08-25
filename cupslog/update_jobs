@@ -1,0 +1,132 @@
+#!/bin/zsh
+# evaluates cups log files.
+# saves in the selected sqlite3 db
+# by gnush
+
+LOGFILE=/var/log/cups/page_log  # PageLogFormat has to be %p;%u;[ATTRIBUTE];%T;...
+DB=""
+
+############### functions ###################
+# converts dates from
+# from dd mmm yyyy
+# to yyyy-mm-dd
+function convertDate(){
+    YEAR=$(echo $1 | awk '{ print $3 }')
+    MONTH=$(mapMonth $(echo $1 | awk '{ print $2 }'))
+    DAY=$(echo $1 | awk '{ print $1 }')
+    echo $YEAR'-'$MONTH'-'$DAY
+}
+
+# converts an unix timestamp
+# to a more readable date.
+# yyyy-mm-dd
+function toDate(){
+  date -d @$1 +"%Y-%m-%d"
+}
+
+# converts an date (yyyy-mm-dd)
+# to an unix timestamp
+function toStamp(){
+  date --date="$1"  +%s
+}
+
+# maps month names to their numbers
+function mapMonth(){
+  case $1 in
+    Jan)
+        echo 1
+      ;;
+    Feb)
+        echo 2
+      ;;
+    Mar)
+        echo 3
+      ;;
+    Apr)
+        echo 4
+      ;;
+    May)
+        echo 5
+      ;;
+    Jun)
+        echo 6
+      ;;
+    Jul)
+        echo 7
+      ;;
+    Aug)
+        echo 8
+      ;;
+    Sep)
+        echo 9
+      ;;
+    Oct)
+        echo 10
+      ;;
+    Nov)
+        echo 11
+      ;;
+    Dec)
+        echo 12
+      ;;
+    *)
+      ;;
+  esac
+}
+############### end functions ###############
+
+# check if logfile already processed (eliminate duplicates)
+DB_DATE=$(sqlite3 $DB 'select time from jobs order by time asc limit 1')
+LOG_DATE=$(toStamp $(convertDate "$(head -n 1 $LOGFILE | sed 's/ /_/g' | sed 's/;/ /g' | awk '{ print $4 }' | sed 's/[[,:]/ /g' | awk '{ print $1 }' | sed 's/\// /g')"))
+
+if [ $DB_DATE -ge $LOG_DATE ]; then
+    exit 1;
+fi
+
+# make tmp copy of logfile, so the original must not be edited
+TMP_FILE=/tmp/cupslog_$(date +%s)
+cp $LOGFILE $TMP_FILE
+LOGFILE=$TMP_FILE
+
+# init id to start with
+ID=$(sqlite3 $DB 'SELECT jid FROM jobs' | tail -n 1)
+
+if [ ! -n $ID ]; then
+    $ID=-1
+fi
+
+# update the db with the new jobs
+while read line;
+do
+    orig=$line
+    line=$(echo $line | sed 's/ /_/g' | sed 's/;/ /g')
+    
+    ID=$(($ID+1))
+    DATE=$(echo $line | awk '{ print $4 }')
+    
+    c=$(echo $DATE | cut -c1-1)
+    if [ $c != '[' ]; then
+        DATE=$(echo $line | awk '{ print $5 }')
+    fi
+
+    DATE=$(echo $DATE | sed 's/[[,:]/ /g' | awk '{ print $1 }' | sed 's/\// /g')
+    DATE=$(convertDate $DATE)
+    DATE=$(toStamp $DATE)
+    
+    printer=$(echo $line | awk '{ print $1 }')    
+    user=$(echo $line | awk '{ print $2 }')
+    pid=$(sqlite3 $DB "SELECT pid FROM printer WHERE name=\"$printer\"")
+    uid=$(sqlite3 $DB "SELECT uid FROM user WHERE name=\"$user\"")
+
+    # if user has no entry in the csv [possible if there are no restrictions on the printers], create a new user in db
+    if [ ! -n "$uid" ]; then
+        ./new_user $user
+        echo $orig >> $LOGFILE
+        continue
+    fi
+
+    sqlite3 $DB "INSERT INTO jobs VALUES ( \"$ID\", \"$uid\", \"$pid\", \"$DATE\" )"
+done < "$LOGFILE"
+
+# clean up tmp
+rm $LOGFILE

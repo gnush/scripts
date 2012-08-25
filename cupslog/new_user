@@ -1,0 +1,30 @@
+#!/bin/zsh
+# creates a new user
+# in the selected db (sqlite3)
+# by gnush
+
+DB=""
+ID=$(sqlite3 $DB 'SELECT uid FROM user' | tail -n 1)
+
+# checks if id is empty
+if [ ! -n $ID ]; then
+    $ID=-1
+fi
+
+# checks if no user is specified
+if [ ! -n $1 ]; then
+    exit 1;
+fi
+
+
+# update database
+usr=$1
+
+# checks if user already in the db
+stmt=$(sqlite3 $DB "SELECT * FROM user WHERE name=$(echo \"$usr\")")
+if [ -n "$stmt" ]; then
+    exit 1;
+fi
+
+ID=$(($ID+1))
+sqlite3 $DB "INSERT INTO user VALUES ( $ID, \"$usr\")"

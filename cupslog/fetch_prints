@@ -1,0 +1,5 @@
+#!/bin/sh
+# fetchs printed pages from the db
+DB=""
+
+sqlite3 -column $DB 'SELECT user.name, printer.name, jobs.time, COUNT(user.name) FROM jobs JOIN user ON jobs.uid=user.uid JOIN printer ON jobs.pid=printer.pid GROUP BY user.name, printer.name, jobs.time'
