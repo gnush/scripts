@@ -17,6 +17,9 @@ if [ ! -z $1 ]; then
    PROFILES=$@
 fi
 
+# Tidying up on termination
+trap "rm ${TMP_PROFILE}" SIGINT SIGTERM SIGQUIT SIGKILL EXIT
+
 echo "Synchronizing the following profiles: ${PROFILES[@]}"
 
 # Create the temporary unison profile.
@@ -52,8 +55,3 @@ unison unison -ignore "Name ${TMP_NAME}.prf"
 if [ $? -ne 0 ]; then
     exit 1
 fi
-
-# Tidying up
-# For the case that you want to manually invoke a sync.
-# rm $TMP_PROFILE   # disabled by default, uncomment at your own risk
-                    # (won't work if unison fails)
