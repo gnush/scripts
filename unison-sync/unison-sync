@@ -52,3 +52,7 @@ unison unison -ignore "Name ${TMP_NAME}.prf"
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+# Tidying up
+# For the case that you want to manually invoke a sync.
+rm $TMP_PROFILE
