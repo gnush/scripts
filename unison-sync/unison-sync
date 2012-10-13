@@ -55,4 +55,5 @@ fi
 
 # Tidying up
 # For the case that you want to manually invoke a sync.
-rm $TMP_PROFILE
+# rm $TMP_PROFILE   # disabled by default, uncomment at your own risk
+                    # (won't work if unison fails)
