@@ -1,0 +1,16 @@
+#!/bin/sh
+
+case $1 in
+    left|right)
+        xrandr --output LVDS1 --primary --auto
+        xrandr --output VGA1 --$1-of LVDS1 --auto
+        ;;
+    *)
+        echo "first parameter must be either 'left' or 'right'"
+        exit 1
+esac
+
+FILE=~/bilder/wallpaper/current
+if [ -r $FILE ]
+    then feh --bg-scale $FILE
+fi
